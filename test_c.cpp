@@ -7,13 +7,46 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <iostream>
+#include <fcntl.h>
+
+using namespace std;
+
 #define SERVER_IP "172.16.75.103"
 
 #define CLIENT_PORT 12345
 #define SERVER_PORT 12346
 
+int MakeSocketNonblocking(int sockfd)
+{
+	int flags = 0;
+	int ret = 0;
+	flags = fcntl(sockfd, F_GETFL, 0);
+	if (flags == -1)
+	{
+		printf("%s F_GETFL failed , sockfd=%d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
+	flags |= O_NONBLOCK;
+	ret = fcntl(sockfd, F_SETFL, flags);
+	if (ret == -1)
+	{
+		printf("%s F_GETFL failed , sockfd=%d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
+	return 0;
+}
+
+
+
+
 int main(int argc, char* argv[])
 {
+	bool bResueAddr = false;
+
+
 	int sockfd;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in sockaddr;
@@ -26,6 +59,8 @@ int main(int argc, char* argv[])
 		printf("error ip\n");
 		return 0;
 	}
+
+
 
 	int ret = bind(sockfd, (struct sockaddr*)&sockaddr, sizeof(sockaddr));
 	if (ret == -1)
@@ -49,16 +84,31 @@ int main(int argc, char* argv[])
 	char *sendata = "hello, i'm client";
 	send(sockfd, sendata, strlen(sendata), 0);
 
+	MakeSocketNonblocking(sockfd);
+
 	char buf[256] = { 0 };
-	while (gets(buf))
+
+	char cmd;
+	while (1)
 	{
-		if (buf == "exit")
+		cin >> cmd;
+		
+		if (cmd == 'q')
 		{
 			printf("exit\n");
 			break;
 		}
-	
+		else if (cmd == 'f')
+		{
+			close(sockfd);
+		}
+		else if (cmd == 's')
+		{
+			send(sockfd, sendata, strlen(sendata), 0);
+		}
 		
+
+		printf("input cmd:  q-exit; f-closesocket; s-senddata;");
 
 	}
 

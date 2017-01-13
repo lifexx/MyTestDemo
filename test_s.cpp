@@ -45,6 +45,7 @@ int MakeSocketNonblocking(int sockfd)
 
 int main(int argc, char* argv[])
 {
+	bool bReuseAddr = false;
 	int sockfd;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in serverAddr;
@@ -55,6 +56,19 @@ int main(int argc, char* argv[])
 		printf("error ip\n");
 		return 0;
 	}
+
+	if (argc == 2 && argv[0] == "A")
+	{
+		bReuseAddr = true;
+	}
+	int opt = 1;
+	if (bReuseAddr)
+	{
+		printf("resuse addr %s:%d", SERVER_IP, SERVER_PORT);
+		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	}
+
+
 
 	if (bind(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1)
 	{
