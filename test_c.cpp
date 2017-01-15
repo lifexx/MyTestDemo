@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define SERVER_IP "172.16.75.103"
+#define SERVER_IP "192.168.114.129"
 
 #define CLIENT_PORT 12345
 #define SERVER_PORT 12346
@@ -91,24 +91,31 @@ int main(int argc, char* argv[])
 	char cmd;
 	while (1)
 	{
-		cin >> cmd;
-		
-		if (cmd == 'q')
+		if (recv(sockfd, buf, sizeof(buf), 0) == 0)
 		{
-			printf("exit\n");
+			printf("recv 0 byte, exit");
+			close(sockfd);
 			break;
 		}
-		else if (cmd == 'f')
-		{
-			close(sockfd);
-		}
-		else if (cmd == 's')
-		{
-			send(sockfd, sendata, strlen(sendata), 0);
-		}
-		
+		sleep(1);
 
-		printf("input cmd:  q-exit; f-closesocket; s-senddata;");
+
+// 		if (cmd == 'q')
+// 		{
+// 			printf("exit\n");
+// 			break;
+// 		}
+// 		else if (cmd == 'f')
+// 		{
+// 			close(sockfd);
+// 		}
+// 		else if (cmd == 's')
+// 		{
+// 			send(sockfd, sendata, strlen(sendata), 0);
+// 		}
+// 		
+// 
+// 		printf("input cmd:  q-exit; f-closesocket; s-senddata;");
 
 	}
 

@@ -15,37 +15,25 @@
 #define SERVER_PORT 12346
 #define MAX_EPOLL_EVENTS  10
 #define RECV_BUF_SIZE (8*1024)
-#define SERVER_IP "172.16.75.103"
+#define SERVER_IP "192.168.114.129"
 
 
 
-int MakeSocketNonblocking(int sockfd)
-{
-	int flags = 0;
-	int ret = 0;
-	flags = fcntl(sockfd, F_GETFL, 0);
-	if (flags == -1)
-	{
-		printf("%s F_GETFL failed , sockfd=%d", __FUNCTION__, sockfd);
-		return -1;
-	}
-
-	flags |= O_NONBLOCK;
-	ret = fcntl(sockfd, F_SETFL, flags);
-	if (ret == -1)
-	{
-		printf("%s F_GETFL failed , sockfd=%d", __FUNCTION__, sockfd);
-		return -1;
-	}
-
-	return 0;
-}
+int MakeSocketNonblocking(int sockfd);
 
 
 
-int main(int argc, char* argv[])
+
+int main(int argc, char** argv)
 {
 	bool bReuseAddr = false;
+	printf("argc=%d\n", argc);
+
+	if (argc == 2 && strcmp(argv[1], "A") == 0)
+	{
+		printf("set reuse addr\n");
+		bReuseAddr = true;
+	}
 	int sockfd;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in serverAddr;
@@ -56,11 +44,8 @@ int main(int argc, char* argv[])
 		printf("error ip\n");
 		return 0;
 	}
+	
 
-	if (argc == 2 && argv[0] == "A")
-	{
-		bReuseAddr = true;
-	}
 	int opt = 1;
 	if (bReuseAddr)
 	{
@@ -176,4 +161,29 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+
+
+
+
+int MakeSocketNonblocking(int sockfd)
+{
+	int flags = 0;
+	int ret = 0;
+	flags = fcntl(sockfd, F_GETFL, 0);
+	if (flags == -1)
+	{
+		printf("%s F_GETFL failed , sockfd=%d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
+	flags |= O_NONBLOCK;
+	ret = fcntl(sockfd, F_SETFL, flags);
+	if (ret == -1)
+	{
+		printf("%s F_GETFL failed , sockfd=%d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
+	return 0;
+}
 
